@@ -5,25 +5,40 @@ cd $path
 #find  .  -name  '._*'  -type  f  -print  -exec  rm  -rf  {} \;
 find . -name '.DS_Store' | xargs rm -rf
 find . -name '._*' | xargs rm -rf
-[ "$(uname -m)" = "Darwin" ] && args="\"\"" 
+[ "$(uname -s)" = "Darwin" ] && args="\"\"" || args=""
 
 github_url="https://github.com/monlor/MIXBOX.git"
 github_raw="https://raw.githubusercontent.com/MIXBOX/master"
 coding_url="https://git.dev.tencent.com/monlor/MIXBOX.git"
 coding_raw="https://dev.tencent.com/u/monlor/p/MIXBOX/git/raw/master"
-inside_url="https://git.dev.tencent.com/monlor/MIXBOX-BETA.git"
-inside_raw="https://dev.tencent.com/u/monlor/p/MIXBOX-BETA/git/raw/master"
 
+sedsh() {
+	[ -z "$1" -o -z "$2" -o -z "$3" ] && echo "null sedsh params!" && exit 1
+	if [ "$(uname -s)" = "Darwin" ]; then
+		if [ "$1" = "s" ]; then
+			sed -i "" "s#$2#$3#g" "$4"
+		elif [[ "$1" = "d" ]]; then
+			sed -i "" "#$2#d" "$3"
+		fi
+	else
+		if [[ "$1" = "s" ]]; then
+			sed -i "s#$2#$3#g" "$4"
+		elif [[ "$1" = "d" ]]; then
+			sed -i "#$2#d" "$3"
+		fi
+	fi
+}
 
 version() {
 	local appname="$1"
 	eval `cat apps/${appname}/config/${appname}.uci | grep version`
-	sed -i "$args" '/version/d' apps/${appname}/config/${appname}.uci
+	# sed -i $args '/version/d' apps/${appname}/config/${appname}.uci
+	sedsh "d" "version" "apps/${appname}/config/${appname}.uci"
 	num1=$(echo "$version" | cut -d'.' -f1)
 	num2=$(echo "$version" | cut -d'.' -f2)
 	num3=$(echo "$version" | cut -d'.' -f3)
 	if [ "$num3" -eq '9' ]; then
-		if [ "$num2" -eq '9' ]; then
+		if [[ "$num2" -eq '9' ]]; then
 			let num1=$num1+1
 			num2=0
 			num3=0
@@ -95,7 +110,8 @@ localgit() {
 
 github() {
 
-	sed -i "$args" "s#^mburl.*#mburl=\"$github_raw\"#" ./install.sh
+	# sed -i $args "s#^mburl.*#mburl=\"$github_raw\"#" ./install.sh
+	sedsh "s" "^mburl.*" "mburl=\"$github_raw\"" "./install.sh"
 	localgit
 	git remote rm origin
 	git remote add origin $github_url
@@ -104,19 +120,11 @@ github() {
 
 coding() {
 
-	sed -i "$args" "s#^mburl.*#mburl=\"$coding_raw\"#" ./install.sh
+	# sed -i $args "s#^mburl.*#mburl=\"$coding_raw\"#" ./install.sh
+	sedsh "s" "^mburl.*" "mburl=\"$coding_raw\"" "./install.sh"
 	localgit
 	git remote rm origin
 	git remote add origin $coding_url
-	git push origin master 
-}
-
-inside() {
-
-	sed -i "$args" "s#^mburl.*#mburl=\"$inside_raw\"#" ./install.sh
-	localgit
-	git remote rm origin
-	git remote add origin $inside_url
 	git push origin master 
 }
 
@@ -133,12 +141,11 @@ reset() {
 	# coding
 	git rm -r --cached .
 }
-rm -rf ./install_test.sh
+
 case $1 in 
 	all) 
 		github
 		coding
-		inside
 		;;
 	github)
 		github		
@@ -153,9 +160,6 @@ case $1 in
 	pack) 
 		shift 1
 		pack $@
-		;;
-	inside)
-		inside
 		;;
 	reset)
 		reset

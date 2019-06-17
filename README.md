@@ -1,10 +1,18 @@
 # MIXBOX 
 
-> MIXBOX是一款全新的，完全基于Shell脚本的工具箱，为在路由器上实现程序的快速配置及运行管理，欢迎大佬们start、fork及pr.
+> MIXBOX是一款全新的，完全基于Shell脚本的工具箱，为在路由器上实现程序的快速配置及运行管理，欢迎大佬们stars、fork及pr.
 
 * Telegram群：[MIXBOX CHAT](https://t.me/joinchat/FMraA0lwzH9fzEW1wXdCFA)
 * 我的博客：[Monlor's Blog](https://www.monlor.com)
 * GitHub地址：[monlor/MIXBOX](https://github.com/monlor/MIXBOX)
+
+### 更新日志
+
+* 2019-03-03
+	* 修复`v2ray`配置文件问题（未测试），感谢`@leafnsand`的PR
+	* 修复`Entware`插件无法启动`ONMP`的问题
+	* 插件`VerySync`和`BaiduPCS`的程序版本更新
+	* 现在修复小米路由器远程访问后会自动开放8098端口
 
 ### 介绍
 
